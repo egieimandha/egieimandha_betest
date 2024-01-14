@@ -24,8 +24,8 @@ module.exports = {
     },
   },
   jwt: {
-    secret: 'jwtsecret',
-    accessExpirationMinutes: 30,
-    refreshExpirationDays: 30,
+    secret: checkEnv('JWT_SECRET'),
+    accessExpirationMinutes: checkEnv('JWT_EXP_MINUTES'),
+    refreshExpirationDays: checkEnv('JWT_EXP_DAYS'),
   },
 };
