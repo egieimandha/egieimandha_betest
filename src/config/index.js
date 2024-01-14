@@ -1,8 +1,22 @@
+const dotenv = require('dotenv');
+
+dotenv.config({ path: '.env' });
+
+const checkEnv = (envVar, defaultValue) => {
+  if (!process.env[envVar]) {
+    if (defaultValue) {
+      return defaultValue;
+    }
+    throw new Error(`Please define the Enviroment variable "${envVar}"`);
+  } else {
+    return process.env[envVar];
+  }
+};
+
 module.exports = {
-  port: 3000,
+  port: checkEnv('PORT'),
   mongoose: {
-    // url: 'mongodb://127.0.0.1:27017/egieimandha-betest',
-    url: 'mongodb+srv://egie_imandha:m1HfqxRwOIqG5yqs@dbtest.ixgieze.mongodb.net/egieimandha-betest?retryWrites=true&w=majority',
+    url: `${checkEnv('MONGODB_URL')}/${checkEnv('DATABASE')}`,
     options: {
       useCreateIndex: true,
       useNewUrlParser: true,
