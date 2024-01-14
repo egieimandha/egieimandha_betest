@@ -2,11 +2,17 @@ const httpStatus = require('http-status');
 const { userService, tokenService } = require('../services');
 
 const getUsers = async (req, res) => {
-  // const filter = pick(req.query, ['name', 'role']);
-  // const options = pick(req.query, ['sortBy', 'limit', 'page']);
   try {
-    const result = await userService.queryUsers();
-    res.send(result);
+    const { limit, page } = req.query;
+    let users;
+    if (limit !== null && limit !== '' && page !== null && page !== '') {
+      users = await await userService.queryUsers(parseInt(limit, 10), parseInt(page, 10));
+    } else {
+      users = await await userService.queryUsers();
+    }
+    res.send({
+      users,
+    });
   } catch (error) {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Something wrong' });
   }
@@ -17,7 +23,7 @@ const getUserByAccountNumber = async (req, res) => {
     const result = await userService.getUserByAccountNumber(req.params.accountNumber);
     res.send(result);
   } catch (error) {
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Something wrong' });
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: error.message });
   }
 };
 
@@ -26,7 +32,7 @@ const getUserByIdentityNumber = async (req, res) => {
     const result = await userService.getUserByIdentityNumber(req.params.identityNumber);
     res.send(result);
   } catch (error) {
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Something wrong' });
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: error.message });
   }
 };
 
@@ -35,7 +41,7 @@ const updateUser = async (req, res) => {
     const result = await userService.updateUserById(req.params.userId, req.body);
     res.send(result);
   } catch (error) {
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Something wrong' });
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: error.message });
   }
 };
 

@@ -7,7 +7,7 @@ async function getAccountNumber() {
     const acct = await User.findOne({ accountNumber });
     return acct ? await getAccountNumber() : accountNumber;
   } catch (e) {
-    // console.error(e);
+    throw new Error('Some think wrong');
   }
 }
 
@@ -33,8 +33,11 @@ const createUser = async (userBodyParam) => {
   return User.create(userBody);
 };
 
-const queryUsers = async () => {
-  const users = await User.find({});
+const queryUsers = async (limit = 10, page = 1) => {
+  const users = await User.find({})
+    .limit(limit)
+    .skip(limit * (page - 1))
+    .sort({ createdAt: -1 });
   return users;
 };
 
@@ -43,7 +46,7 @@ const getUserByEmail = async (email) => {
 };
 
 const getUserByAccountNumber = async (accountNumber) => {
-  const user = await User.findOne({ accountNumber });
+  const user = await User.findOne({ accountNumber }).lean();
 
   if (!user) {
     throw new Error('User Not Found');
