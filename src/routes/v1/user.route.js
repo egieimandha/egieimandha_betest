@@ -10,4 +10,6 @@ router.route('/by-accountNumber/:accountNumber').get(auth(), userController.getU
 
 router.route('/by-identityNumber/:identityNumber').get(auth(), userController.getUserByIdentityNumber);
 
+router.route('/:userId').patch(auth(), userController.updateUser).delete(auth(), userController.deleteUser);
+
 module.exports = router;

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
+const { ExtractJwt } = require('passport-jwt');
 const config = require('../config');
 const { Token } = require('../models');
 
@@ -10,6 +11,14 @@ const generateToken = (userId, expires, secret = config.jwt.secret) => {
     exp: expires.unix(),
   };
   return jwt.sign(payload, secret);
+};
+
+const decodeToken = (token) => {
+  const jwtOptions = {
+    secretOrKey: config.jwt.secret,
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  };
+  return jwt.decode(token, jwtOptions);
 };
 
 const saveToken = async (token, userId, expires) => {
@@ -45,4 +54,5 @@ module.exports = {
   saveToken,
   generateAuthTokens,
   verifyToken,
+  decodeToken,
 };

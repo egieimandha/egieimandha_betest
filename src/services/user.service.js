@@ -11,7 +11,7 @@ async function getAccountNumber() {
   }
 }
 
-const createUser = async (userBodyParam) => {
+const validateUserData = async (userBodyParam) => {
   if (await User.isEmailTaken(userBodyParam.emailAddress)) {
     throw new Error('Email already taken');
   }
@@ -21,6 +21,10 @@ const createUser = async (userBodyParam) => {
   if (await User.isDuplicateIdentitiyNumber(userBodyParam.identityNumber)) {
     throw new Error('Identity number already exist');
   }
+};
+
+const createUser = async (userBodyParam) => {
+  await validateUserData(userBodyParam);
   const accountNumber = await getAccountNumber();
   const userBody = {
     accountNumber,
@@ -58,10 +62,45 @@ const getUserByIdentityNumber = async (identityNumber) => {
   return user;
 };
 
+const getUserById = async (id) => {
+  return User.findById(id);
+};
+
+const updateUserById = async (userId, updateBody) => {
+  const user = await getUserById(userId);
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+  await validateUserData(updateBody);
+
+  // need to delete body bc user can update accountNumber
+  // bc it will have chance accountNumber to be duplicate
+  if (updateBody.accountNumber) {
+    // eslint-disable-next-line no-param-reassign
+    delete updateBody.accountNumber;
+  }
+
+  Object.assign(user, updateBody);
+  await user.save();
+  return user;
+};
+
+const deleteUserById = async (userId) => {
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+  await user.deleteOne();
+  return user;
+};
+
 module.exports = {
   createUser,
   queryUsers,
   getUserByEmail,
   getUserByAccountNumber,
   getUserByIdentityNumber,
+  updateUserById,
+  deleteUserById,
 };
