@@ -16,7 +16,7 @@ const checkEnv = (envVar, defaultValue) => {
 module.exports = {
   port: checkEnv('PORT'),
   mongoose: {
-    url: `${checkEnv('MONGODB_URL')}/${checkEnv('DATABASE')}`,
+    url: `${checkEnv('MONGODB_URL')}`,
     options: {
       useCreateIndex: true,
       useNewUrlParser: true,
