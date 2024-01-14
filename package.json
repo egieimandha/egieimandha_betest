@@ -9,6 +9,7 @@
   "author": "Egie Imandha",
   "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.18.2",
     "http-status": "^1.7.3",
     "jsonwebtoken": "^9.0.2",

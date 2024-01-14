@@ -2,7 +2,6 @@ const passport = require('passport');
 const httpStatus = require('http-status');
 
 const verifyCallback = (req, resolve, reject) => async (err, user, info) => {
-  // console.log(user);
   if (err || info || !user) {
     return reject(httpStatus.UNAUTHORIZED, 'Please authenticate');
   }

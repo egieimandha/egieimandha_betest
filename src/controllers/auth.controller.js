@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { userService, tokenService } = require('../services');
+const { userService, tokenService, authService } = require('../services');
 
 const register = async (req, res) => {
   try {
@@ -8,12 +8,27 @@ const register = async (req, res) => {
     res.status(httpStatus.CREATED).send({ user, ...token });
   } catch (error) {
     // console.log(error);
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Something wrong' });
+    res.status(httpStatus.BAD_REQUEST).send({ message: error.message });
   }
 };
 
 const login = async (req, res) => {
-  res.send('bellow');
+  try {
+    const { email, password } = req.body;
+    const user = await authService.loginUserWithEmailAndPassword(email, password);
+    const token = await tokenService.generateAuthTokens(user);
+    const { accountNumber, identityNumber } = user;
+    res.send({
+      user: {
+        accountNumber,
+        identityNumber,
+      },
+      ...token,
+    });
+  } catch (error) {
+    // console.log(error);
+    res.status(httpStatus.BAD_REQUEST).send({ message: error.message });
+  }
 };
 
 module.exports = {
