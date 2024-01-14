@@ -1,3 +1,4 @@
+const { setRedist, getRedist } = require('../config/redis');
 const { User } = require('../models');
 
 async function getAccountNumber() {
@@ -34,11 +35,30 @@ const createUser = async (userBodyParam) => {
 };
 
 const queryUsers = async (limit = 10, page = 1) => {
+  const cacheKey = `redis_egieimandha_betest`;
+  const cachedData = await getRedist(cacheKey);
+  if (cachedData) {
+    return JSON.parse(cachedData);
+  }
+
+  const totalDatas = await User.countDocuments({});
   const users = await User.find({})
     .limit(limit)
     .skip(limit * (page - 1))
     .sort({ createdAt: -1 });
-  return users;
+
+  const result = {
+    users,
+    meta: {
+      page,
+      totalPages: Math.ceil(totalDatas / limit) || 0,
+      totalDatas,
+    },
+  };
+
+  await setRedist(cacheKey, JSON.stringify(result), 3600);
+
+  return result;
 };
 
 const getUserByEmail = async (email) => {
@@ -46,21 +66,35 @@ const getUserByEmail = async (email) => {
 };
 
 const getUserByAccountNumber = async (accountNumber) => {
-  const user = await User.findOne({ accountNumber }).lean();
+  const cacheKey = `redis_egieimandha_${accountNumber}_betest`;
+  const cachedData = await getRedist(cacheKey);
+  if (cachedData) {
+    return JSON.parse(cachedData);
+  }
 
+  const user = await User.findOne({ accountNumber }).lean();
   if (!user) {
     throw new Error('User Not Found');
   }
+
+  await setRedist(cacheKey, JSON.stringify(user), 3600);
 
   return user;
 };
 
 const getUserByIdentityNumber = async (identityNumber) => {
-  const user = await User.findOne({ identityNumber });
+  const cacheKey = `redis_egieimandha_${identityNumber}_betest`;
+  const cachedData = await getRedist(cacheKey);
+  if (cachedData) {
+    return JSON.parse(cachedData);
+  }
 
+  const user = await User.findOne({ identityNumber });
   if (!user) {
     throw new Error('User Not Found');
   }
+
+  await setRedist(cacheKey, JSON.stringify(user), 3600);
 
   return user;
 };

@@ -6,12 +6,12 @@ const getUsers = async (req, res) => {
     const { limit, page } = req.query;
     let users;
     if (limit !== null && limit !== '' && page !== null && page !== '') {
-      users = await await userService.queryUsers(parseInt(limit, 10), parseInt(page, 10));
+      users = await userService.queryUsers(parseInt(limit, 10), parseInt(page, 10));
     } else {
-      users = await await userService.queryUsers();
+      users = await userService.queryUsers();
     }
     res.send({
-      users,
+      data: users,
     });
   } catch (error) {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Something wrong' });

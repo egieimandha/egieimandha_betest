@@ -28,4 +28,9 @@ module.exports = {
     accessExpirationMinutes: checkEnv('JWT_EXP_MINUTES'),
     refreshExpirationDays: checkEnv('JWT_EXP_DAYS'),
   },
+  redis: {
+    host: checkEnv('REDIS_HOST'),
+    port: checkEnv('REDIS_PORT'),
+    password: checkEnv('REDIS_PASSWORD'),
+  },
 };
