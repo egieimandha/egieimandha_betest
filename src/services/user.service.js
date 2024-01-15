@@ -1,4 +1,4 @@
-const { setRedist, getRedist } = require('../config/redis');
+const { setRedist, getRedist, deleteRedist } = require('../config/redis');
 const { User } = require('../models');
 
 async function getAccountNumber() {
@@ -31,6 +31,8 @@ const createUser = async (userBodyParam) => {
     accountNumber,
     ...userBodyParam,
   };
+  const cacheKey = `redis_egieimandha_betest`;
+  deleteRedist(cacheKey);
   return User.create(userBody);
 };
 
@@ -120,6 +122,13 @@ const updateUserById = async (userId, updateBody) => {
 
   Object.assign(user, updateBody);
   await user.save();
+
+  const cacheKeyAccountNumber = `redis_egieimandha_${user.accountNumber}_betest`;
+  await setRedist(cacheKeyAccountNumber, JSON.stringify(user), 3600);
+
+  const cacheKeyIdentitiyNumber = `redis_egieimandha_${user.identityNumber}_betest`;
+  await setRedist(cacheKeyIdentitiyNumber, JSON.stringify(user), 3600);
+
   return user;
 };
 
@@ -128,6 +137,12 @@ const deleteUserById = async (userId) => {
   if (!user) {
     throw new Error('User not found');
   }
+  const cacheKey = `redis_egieimandha_betest`;
+  const cacheKeyAccountNumber = `redis_egieimandha_${user.accountNumber}_betest`;
+  const cacheKeyIdentitiyNumber = `redis_egieimandha_${user.identityNumber}_betest`;
+  deleteRedist(cacheKey);
+  deleteRedist(cacheKeyAccountNumber);
+  deleteRedist(cacheKeyIdentitiyNumber);
   await user.deleteOne();
   return user;
 };
